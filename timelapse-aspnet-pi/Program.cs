@@ -8,22 +8,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace WebApp1
+namespace Timelapse.Webapp
 {
   public class Program
   {
     public static void Main(string[] args)
     {
-      foreach (var networkInterface in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
-      {
-        Console.Write($"{Environment.NewLine}{networkInterface.Id},{networkInterface.Description},{networkInterface.Name}{Environment.NewLine}");
-
-        foreach (var address in networkInterface.GetIPProperties().UnicastAddresses)
-        {
-          Console.Write($"- {address.Address}{Environment.NewLine}");
-        }
-      }
-
+      //DumpNetworkInterfaces();
 
       BuildWebHost(args).Run();
     }
@@ -32,5 +23,19 @@ namespace WebApp1
         WebHost.CreateDefaultBuilder(args)
             .UseStartup<Startup>()
             .Build();
+
+
+    private static void DumpNetworkInterfaces()
+    {
+      foreach (var networkInterface in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+      {
+        Console.Write(
+          $"{Environment.NewLine}{networkInterface.Id},{networkInterface.Description},{networkInterface.Name}{Environment.NewLine}");
+
+        foreach (var address in networkInterface.GetIPProperties().UnicastAddresses)
+          Console.Write($"- {address.Address}{Environment.NewLine}");
+      }
+    }
+
   }
 }

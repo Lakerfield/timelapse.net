@@ -11,8 +11,10 @@ RUN dotnet publish -c Release -r linux-arm -o out
 
 # build runtime image
 FROM lakerfield/dotnet-gphoto2
+ENV TZ=Europe/Amsterdam
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /app
 EXPOSE 80/tcp
 ENV ASPNETCORE_URLS http://0.0.0.0:80
 COPY --from=build-env /app/out ./
-ENTRYPOINT ["dotnet", "dotnetapp.dll"]
+ENTRYPOINT ["dotnet", "timelapse-webapp.dll"]
