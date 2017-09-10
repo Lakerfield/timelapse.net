@@ -32,6 +32,18 @@ https://stackoverflow.com/questions/24225647/docker-any-way-to-give-access-to-ho
     gphoto2 --capture-image-and-download
 
 
+# timelapse-net-pi
+
+    # docker host (raspberry pi)
+    sudo mkdir /data
+    docker run --rm --privileged -v /dev/bus/usb:/dev/bus/usb -v /data:/data lakerfield/timelapse-net-pi Bertus
+
+
+# on raspberry pi
+
+    docker pull lakerfield/timelapse-aspnet-pi:latest
+    docker run --rm -p 80:80 lakerfield/timelapse-aspnet-pi:latest
+    docker run --rm  --privileged -v /dev/bus/usb:/dev/bus/usb -v /data:/data -p 80:80 lakerfield/timelapse-aspnet-pi:latest
 
 
 
