@@ -16,7 +16,7 @@ namespace Timelapse.Webapp
 {
   public class Startup
   {
-    public static DateTime StartupDateTime { get; } = DateTime.Now;
+    public static DateTime StartupDateTime;
 
     private object _timelapseTimerLockObject = new object();
     private CancellationTokenSource _timelapseCancellationTokenSource;
@@ -152,6 +152,7 @@ namespace Timelapse.Webapp
       //  }
       //});
 
+      StartupDateTime = DateTime.Now;
       StartTimer();
     }
 
@@ -163,8 +164,17 @@ namespace Timelapse.Webapp
         if (_timelapseTimer == null)
         {
           _timelapseCancellationTokenSource = new CancellationTokenSource();
-          _timelapseTimer = new TimelapseTimer(TimeSpan.FromSeconds(10),
-            async () => { Console.WriteLine(DateTime.Now.ToLongTimeString()); });
+          _timelapseTimer = new TimelapseTimer(
+            TimeSpan.FromSeconds(150), 
+            new TimeSpan(06, 59, 00), 
+            new TimeSpan(17, 01, 00), 
+            async () =>
+            {
+              Console.WriteLine($"Start action on {DateTime.Now.ToLongTimeString()}");
+
+              var executer = new Gphoto2Executer();
+              var results = await executer.CaptureImageAndDownload();
+            });
 
           _timelapseTimer.Run(_timelapseCancellationTokenSource.Token);
           isStarted = true;

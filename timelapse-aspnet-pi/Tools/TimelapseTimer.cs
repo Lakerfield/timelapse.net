@@ -10,19 +10,26 @@ namespace Timelapse.Webapp.Tools
   {
     private readonly Func<Task> _action;
     public TimeSpan RunEvery { get; }
+    public TimeSpan RunFrom { get; }
+    public TimeSpan RunTill { get; }
 
-    public TimelapseTimer(TimeSpan runEvery, Func<Task> action)
+    public TimelapseTimer(TimeSpan runEvery, TimeSpan runFrom, TimeSpan runTill, Func<Task> action)
     {
       _action = action;
       RunEvery = runEvery;
+      RunFrom = runFrom;
+      RunTill = runTill;
     }
 
     public async Task Run(CancellationToken cancellationToken)
     {
+      Console.WriteLine($"Timer started for every {RunEvery} between {RunFrom} and {RunTill}");
       again:
       try
       {
-        await _action();
+        var time = DateTime.Now.TimeOfDay;
+        if (time >= RunFrom && time <= RunTill)
+          await _action();
       }
       catch (Exception exception)
       {
