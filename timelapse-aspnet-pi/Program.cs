@@ -21,6 +21,7 @@ namespace Timelapse.Webapp
 
     public static IWebHost BuildWebHost(string[] args) =>
         WebHost.CreateDefaultBuilder(args)
+            .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning))
             .UseStartup<Startup>()
             .Build();
 

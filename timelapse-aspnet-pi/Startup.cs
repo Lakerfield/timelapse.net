@@ -9,12 +9,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Timelapse.Webapp.Tools;
 
 namespace Timelapse.Webapp
 {
   public class Startup
   {
+    public static DateTime StartupDateTime { get; } = DateTime.Now;
+
     private object _timelapseTimerLockObject = new object();
     private CancellationTokenSource _timelapseCancellationTokenSource;
     private TimelapseTimer _timelapseTimer;
@@ -23,6 +26,7 @@ namespace Timelapse.Webapp
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
+      services.AddMvc();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,21 +42,7 @@ namespace Timelapse.Webapp
         subApp.Run(async context =>
         {
           context.Response.ContentType = "text/plain";
-          bool isStarted = false;
-          lock (_timelapseTimerLockObject)
-          {
-            if (_timelapseTimer == null)
-            {
-              _timelapseCancellationTokenSource = new CancellationTokenSource();
-              _timelapseTimer = new TimelapseTimer(TimeSpan.FromSeconds(10), async () =>
-              {
-                Console.WriteLine(DateTime.Now.ToLongTimeString());
-              });
-
-              _timelapseTimer.Run(_timelapseCancellationTokenSource.Token);
-              isStarted = true;
-            }
-          }
+          var isStarted = StartTimer();
           await context.Response.WriteAsync(isStarted ? "Timelapse started" : "Timelapse already running");
         });
       });
@@ -62,17 +52,7 @@ namespace Timelapse.Webapp
         subApp.Run(async context =>
         {
           context.Response.ContentType = "text/plain";
-          bool isStopped = false;
-          lock (_timelapseTimerLockObject)
-          {
-            if (_timelapseTimer != null)
-            {
-              _timelapseCancellationTokenSource.Cancel();
-              _timelapseTimer = null;
-              _timelapseCancellationTokenSource = null;
-              isStopped = true;
-            }
-          }
+          var isStopped = StopTimer();
           await context.Response.WriteAsync(isStopped ? "Timelapse stopped" : "Timelapse was not running");
         });
       });
@@ -129,10 +109,31 @@ namespace Timelapse.Webapp
         });
       });
 
+      app.UseMvc();
+
+      app.MapWhen(context => context.Request.Path.StartsWithSegments("/health"), subApp =>
+      {
+        subApp.Run(async context =>
+        {
+          var healty = _timelapseTimer != null;
+          if (!healty)
+          {
+            context.Response.StatusCode = 500;
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync($"Sick on {DateTime.Now}");
+            return;
+          }
+
+          context.Response.ContentType = "text/plain";
+          await context.Response.WriteAsync($"Alive on {DateTime.Now}");
+        });
+      });
+
       app.Run(async (context) =>
       {
+        context.Response.StatusCode = 404;
         context.Response.ContentType = "text/plain";
-        await context.Response.WriteAsync($"Current time {DateTime.Now}");
+        await context.Response.WriteAsync($"Resource not found on {DateTime.Now}");
       });
 
       //app.Run(async (context) =>
@@ -150,6 +151,43 @@ namespace Timelapse.Webapp
       //      await context.Response.WriteAsync($"- {address.Address}{Environment.NewLine}");
       //  }
       //});
+
+      StartTimer();
     }
+
+    private bool StartTimer()
+    {
+      bool isStarted = false;
+      lock (_timelapseTimerLockObject)
+      {
+        if (_timelapseTimer == null)
+        {
+          _timelapseCancellationTokenSource = new CancellationTokenSource();
+          _timelapseTimer = new TimelapseTimer(TimeSpan.FromSeconds(10),
+            async () => { Console.WriteLine(DateTime.Now.ToLongTimeString()); });
+
+          _timelapseTimer.Run(_timelapseCancellationTokenSource.Token);
+          isStarted = true;
+        }
+      }
+      return isStarted;
+    }
+
+    private bool StopTimer()
+    {
+      bool isStopped = false;
+      lock (_timelapseTimerLockObject)
+      {
+        if (_timelapseTimer != null)
+        {
+          _timelapseCancellationTokenSource.Cancel();
+          _timelapseTimer = null;
+          _timelapseCancellationTokenSource = null;
+          isStopped = true;
+        }
+      }
+      return isStopped;
+    }
+
   }
 }
