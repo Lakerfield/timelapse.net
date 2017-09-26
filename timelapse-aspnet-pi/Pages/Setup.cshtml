@@ -1,0 +1,26 @@
+﻿@page
+@using Timelapse.Webapp.Pages
+@model Timelapse.Webapp.Pages.SetupModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<html>
+<body>
+  <h1>Setup timelapse</h1>
+
+  <p>
+    Enter your name.
+  </p>
+  <div asp-validation-summary="All"></div>
+  <form method="POST">
+    <div>
+      Every: <input asp-for="Settings.Every" />
+    </div>
+    <div>
+      From: <input asp-for="Settings.From" />
+    </div>
+    <div>
+      Till: <input asp-for="Settings.Till" />
+    </div>
+    <input type="submit" />
+  </form>
+</body>
+</html>

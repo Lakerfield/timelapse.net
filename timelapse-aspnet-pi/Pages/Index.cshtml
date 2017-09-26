@@ -1,29 +1,30 @@
 ﻿@page
 @using Timelapse.Webapp
+@using Timelapse.Webapp.Pages
+@model IndexModel
 @{
 }
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>picam</title>
+  <title>Timelapse.net</title>
 </head>
 <body>
+  <h1>Timelapse.net on a raspberry pi</h1>
 
-  <h1>picam</h1>
-
-  <h2>photos</h2>
-  <p>Check the <a href="/latest">latest</a> photo</p>
+  <h2>Photos</h2>
+  <p>Check the <a href="/latest">latest</a> photo from @Model.LatestPhotoDateTime</p>
 
   <h2>Timer</h2>
   <ul>
+    <li><a href="/setup">setup</a></li>
     <li><a href="/start">start</a></li>
     <li><a href="/stop">stop</a></li>
   </ul>
 
-  <h2>Docter</h2>
+  <h2>Medical</h2>
   <p>Check <a href="/health">health</a></p>
-
 
   <footer>
     Lakerfield 2017 - Current time: @DateTime.Now - Start time: @Startup.StartupDateTime
