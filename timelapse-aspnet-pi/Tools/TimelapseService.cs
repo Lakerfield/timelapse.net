@@ -64,6 +64,7 @@ namespace Timelapse.Webapp.Tools
 
               var executer = new Gphoto2Executer();
               var results = await executer.CaptureImageAndDownload();
+              LatestPhoto = new FileInfo(results.Filename);
             });
 
           var runTask = _timelapseTimer.Run(_timelapseCancellationTokenSource.Token);
