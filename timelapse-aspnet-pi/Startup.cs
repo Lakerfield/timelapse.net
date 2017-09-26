@@ -166,7 +166,7 @@ namespace Timelapse.Webapp
           _timelapseCancellationTokenSource = new CancellationTokenSource();
           _timelapseTimer = new TimelapseTimer(
             TimeSpan.FromSeconds(150), 
-            new TimeSpan(06, 59, 00), 
+            new TimeSpan(06, 55, 00), 
             new TimeSpan(17, 01, 00), 
             async () =>
             {
