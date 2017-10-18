@@ -1,0 +1,125 @@
+<html>
+<head>
+  <title>Waterpeil 18</title>
+  <style>
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.containerRoot {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    height: 100%;
+}
+
+.container {
+    flex: 1 1 auto;
+
+    display: flex;
+    flex-flow: row;
+}
+
+.header {
+    flex: 1 1 auto;
+    background: #f0672f;
+    color: white;
+    min-height: 40px;
+    max-height: 40px;
+    text-align: center;
+}
+
+.header a {
+    color: white;
+    display: inline-block;
+    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 26px;
+    font-weight: normal;
+    text-decoration: none;
+    margin-top: 4px;
+}
+
+.box {
+    flex: 1 1 auto;
+    background: #585754;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.box img {
+    width: 100%;
+    object-fit: contain;
+    object-position: top;
+    vertical-align: top;
+}
+
+  </style>
+</head>
+
+<body onload="newimg()">
+
+<div class="containerRoot">
+    <div class="header">
+      <a id="link0" href="#" onclick="update(false, false)">geen</a>
+      <a id="link1" href="#" onclick="update(true, true)">camera 1 &amp; 2</a> &nbsp;
+      <a id="link2" href="#" onclick="update(true, false)">camera 1</a> &nbsp;
+      <a id="link3" href="#" onclick="update(false, true)">camera 2</a>
+    </div>
+    <div class="container">
+
+        <div class="box" id="box1">
+            <img id="img1" src="http://192.168.178.219/" />
+        </div>
+        <div class="box" id="box2">
+            <img id="img2" src="http://192.168.178.219/" />
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+var cam1 = true;
+var cam2 = false;
+var box1 = document.getElementById('box1');
+var box2 = document.getElementById('box2');
+var img1 = document.getElementById('img1');
+var img2 = document.getElementById('img2');
+var link0 = document.getElementById('link0');
+var link1 = document.getElementById('link1');
+var link2 = document.getElementById('link2');
+var link3 = document.getElementById('link3');
+
+function newimg(){
+  var token = '' + Date.parse(new Date().toString());
+
+    if (cam1)
+        img1.src = "http://192.168.178.219/latest?" + token;
+    if (cam2)
+        img2.src = "http://192.168.178.219/?" + token;
+
+
+
+
+  setTimeout(newimg,30000);
+}
+
+function update(enable1, enable2) {
+    cam1 = enable1;
+    cam2 = enable2;
+    box1.style.display = cam1 ? 'block' : 'none';
+    box2.style.display = cam2 ? 'block' : 'none';
+
+    link0.style.color = !cam1 && !cam2 ? '#5288BB' : '';
+    link1.style.color = cam1 && cam2 ? '#5288BB' : '';
+    link2.style.color = cam1 && !cam2 ? '#5288BB' : '';
+    link3.style.color = !cam1 && cam2 ? '#5288BB' : '';
+}
+
+update(true, false);
+</script>
+
+</body>
+</html>
